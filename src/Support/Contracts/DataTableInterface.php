@@ -2,15 +2,14 @@
 
 namespace Khill\Lavacharts\Support\Contracts;
 
-use \Khill\Lavacharts\DataTables\DataTable;
-
 /**
- * Trait DataTableTrait
+ * DataTableInterface
  *
- * Provides common methods for working with DataTables.
+ * This interface describes an object that can be turned into a DataTable by Lavacharts
  *
  *
- * @package   Khill\Lavacharts\Support\Traits
+ *
+ * @package   Khill\Lavacharts\Support\Contracts
  * @author    Kevin Hill <kevinkhill@gmail.com>
  * @copyright (c) 2017, KHill Designs
  * @link      http://github.com/kevinkhill/lavacharts GitHub Repository Page
@@ -20,27 +19,44 @@ use \Khill\Lavacharts\DataTables\DataTable;
 interface DataTableInterface
 {
     /**
-     * Sets the DataTable
+     * The method that will be called when this object is going to be cast
+     * as a DataTable
      *
-     * @since  3.1.0
-     * @param  \Khill\Lavacharts\DataTables\DataTable $datatable
-     * @return self
+     * @returns \Khill\Lavacharts\DataTables\DataTable
      */
-    public function setDataTable(DataTable $datatable);
+    public function toDataTable();
 
     /**
-     * Returns the DataTable
+     * Returns an array of arrays describing the columns that will be used
+     * to build the DataTable when this object is cast.
      *
-     * @since  3.0.0
-     * @return \Khill\Lavacharts\DataTables\DataTable
+     * @return array[][]
      */
-    public function getDataTable();
+    public function getColumns();
+    /**
+     * return [
+     *     ['date', 'Pay Date'],
+     *     ['number', 'Direct Deposit']
+     * ];
+     */
+
 
     /**
-     * Returns a JSON string representation of the datatable.
+     * Returns an array of arrays describing the rows that will be added
+     * to the DataTable when this object is cast.
      *
-     * @since  2.5.0
-     * @return string
+     * @return array[][]
      */
-    public function getDataTableJson();
+    public function getRows();
+    /**
+     * return $this
+     *     ->select(['pay_date', 'direct_deposit'])
+     *     ->where('direct_deposit', '<>', null)
+     *     ->orderBy('pay_date')
+     *     ->get()
+     *     ->transform(function ($s) {
+     *         return [$s->pay_date, $s->direct_deposit];
+     *     })
+     *     ->toArray();
+     */
 }

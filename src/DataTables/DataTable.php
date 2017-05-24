@@ -4,6 +4,7 @@ namespace Khill\Lavacharts\DataTables;
 
 use DateTimeZone;
 use JsonSerializable;
+use Khill\Lavacharts\DataTables\Columns\Column;
 use Khill\Lavacharts\DataTables\Formats\Format;
 use Khill\Lavacharts\DataTables\Rows\Row;
 use Khill\Lavacharts\DataTables\Columns\ColumnFactory;
@@ -12,8 +13,11 @@ use Khill\Lavacharts\Exceptions\InvalidColumnIndex;
 use Khill\Lavacharts\Exceptions\InvalidColumnRole;
 use Khill\Lavacharts\Exceptions\InvalidConfigValue;
 use Khill\Lavacharts\Exceptions\InvalidDateTimeFormat;
+use Khill\Lavacharts\Exceptions\InvalidRowDefinition;
 use Khill\Lavacharts\Exceptions\InvalidTimeZone;
+use Khill\Lavacharts\Support\Contracts\DataTableInterface as ToDataTable;
 use Khill\Lavacharts\Support\Contracts\JsonableInterface as Jsonable;
+use Khill\Lavacharts\Support\Traits\ToDataTableTrait;
 use Khill\Lavacharts\Values\Role;
 use Khill\Lavacharts\Values\StringValue;
 
@@ -39,8 +43,10 @@ use Khill\Lavacharts\Values\StringValue;
  * @link      http://lavacharts.com                   Official Docs Site
  * @license   http://opensource.org/licenses/MIT      MIT
  */
-class DataTable implements Jsonable, JsonSerializable
+class DataTable implements ToDataTable, Jsonable, JsonSerializable
 {
+    use ToDataTableTrait;
+
     /**
      * Timezone for dealing with datetime and Carbon objects.
      *
@@ -245,18 +251,24 @@ class DataTable implements Jsonable, JsonSerializable
     /**
      * Adds multiple columns to the DataTable
      *
+     *
+     * @since 3.1.6 Modified to accept Column classes as well as array definitions
      * @param  array $arrayOfColumns Array of columns to batch add to the DataTable.
      * @return \Khill\Lavacharts\DataTables\DataTable
      * @throws \Khill\Lavacharts\Exceptions\InvalidColumnDefinition
      */
     public function addColumns(array $arrayOfColumns)
     {
-        foreach ($arrayOfColumns as $columnArray) {
-            if (is_array($columnArray) === false) {
-                throw new InvalidColumnDefinition($columnArray);
-            }
+        foreach ($arrayOfColumns as $column) {
+            if ($column instanceof Column) {
+                $this->cols[] = $column;
+            } else {
+                if (is_array($column) === false) {
+                    throw new InvalidColumnDefinition($column);
+                }
 
-            call_user_func_array([$this, 'createColumnWithParams'], $columnArray);
+                call_user_func_array([$this, 'createColumnWithParams'], $column);
+            }
         }
 
         return $this;
@@ -493,6 +505,7 @@ class DataTable implements Jsonable, JsonSerializable
      * Adds multiple rows to the DataTable.
      *
      * @see    addRow()
+     * @since 3.1.6 Added the ability to accept row Classes as well as array definitions.
      * @param  \Khill\Lavacharts\DataTables\Rows\Row[] $arrayOfRows
      * @return \Khill\Lavacharts\DataTables\DataTable
      * @throws \Khill\Lavacharts\Exceptions\InvalidConfigValue
@@ -500,9 +513,17 @@ class DataTable implements Jsonable, JsonSerializable
      */
     public function addRows(array $arrayOfRows)
     {
-        /** @var array $row */
         foreach ($arrayOfRows as $row) {
-            $this->addRow($row);
+            if ($row instanceof Row) {
+                $this->rows[] = $row;
+            } else {
+                if (is_array($row) === false) {
+                    throw new InvalidRowDefinition($row);
+                }
+
+                $this->addRow($row);
+            }
+
         }
 
         return $this;

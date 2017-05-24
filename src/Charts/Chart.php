@@ -2,6 +2,7 @@
 
 namespace Khill\Lavacharts\Charts;
 
+use Khill\Lavacharts\Support\Contracts\DataTableInterface;
 use Khill\Lavacharts\Support\Customizable;
 use Khill\Lavacharts\DataTables\DataTable;
 use Khill\Lavacharts\Values\ElementId;
@@ -40,15 +41,15 @@ class Chart extends Customizable implements Renderable, Wrappable, Jsonable, Vis
      * Builds a new chart with the given label.
      *
      * @param \Khill\Lavacharts\Values\Label         $chartLabel Identifying label for the chart.
-     * @param \Khill\Lavacharts\DataTables\DataTable $datatable DataTable used for the chart.
+     * @param \Khill\Lavacharts\Support\Contracts\DataTableInterface $data DataTable used for the chart.
      * @param array                                  $options Options fot the chart.
      */
-    public function __construct(Label $chartLabel, DataTable $datatable = null, array $options = [])
+    public function __construct(Label $chartLabel, DataTableInterface $data = null, array $options = [])
     {
         parent::__construct($options);
 
         $this->label = $chartLabel;
-        $this->datatable = $datatable;
+        $this->datatable = $data->toDataTable();
 
         if (array_key_exists('elementId', $options)) {
             $this->elementId = new ElementId($options['elementId']);

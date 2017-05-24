@@ -1,3 +1,16 @@
+- 3.1.6
+  - Adding config file to further customize lavacharts.
+  - Can be published in Laravel with `php artisan vendor:publish`
+  - If the main Lavacharts class is not passed an array of config values
+    when created then defaults will be loaded from `src/Laravel/config/lavacharts.php`
+  - The values are self documented in the file, [just check out the source](https://github.com/kevinkhill/lavacharts/blob/3.1-dev/src/Laravel/config/lavacharts.php).
+
+- 3.1.5
+  - Adding DonutChart as an alias for PieChart back.
+
+- 3.1.4
+  - Resize bug fixed
+  
 - 3.1.3 
   - Adding JavascriptDate class that mimics the way the Javascript Date object is created. (I wanted to be able to copy and paste google's examples into addRows)
   

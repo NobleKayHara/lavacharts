@@ -39,14 +39,7 @@ class Lavacharts
     /**
      * Lavacharts version
      */
-    const VERSION = '3.1.5';
-
-    /**
-     * Locale for the Charts and Dashboards.
-     *
-     * @var string
-     */
-    private $locale = 'en';
+    const VERSION = '3.1.6';
 
     /**
      * Default Config for Lavacharts
@@ -75,7 +68,7 @@ class Lavacharts
      * @param array $config
      */
     public function __construct(array $config = [])
-    {dd($config);
+    {
         if (!empty($defaultConfig)) {
             $this->config = $config;
         } else {
@@ -231,9 +224,9 @@ class Lavacharts
      * @return $this
      * @throws \Khill\Lavacharts\Exceptions\InvalidStringValue
      */
-    public function setLocale($locale = 'en')
+    public function setLocale($locale)
     {
-        $this->locale = new StringValue($locale);
+        $this->config['locale'] = (string) new StringValue($locale);
 
         return $this;
     }
@@ -245,7 +238,7 @@ class Lavacharts
      */
     public function getLocale()
     {
-        return $this->locale;
+        return $this->config['locale'];
     }
 
     /**
@@ -258,11 +251,7 @@ class Lavacharts
      */
     public function lavajs()
     {
-        $config = [
-            'locale' => $this->locale
-        ];
-
-        return (string) $this->scriptManager->getLavaJsModule($config);
+        return (string) $this->scriptManager->getLavaJsModule($this->config);
     }
 
     /**
