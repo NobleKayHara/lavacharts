@@ -49,6 +49,13 @@ class Lavacharts
     private $locale = 'en';
 
     /**
+     * Default Config for Lavacharts
+     *
+     * @var array
+     */
+    private $config;
+
+    /**
      * Holds all of the defined Charts and DataTables.
      *
      * @var \Khill\Lavacharts\Volcano
@@ -64,9 +71,17 @@ class Lavacharts
 
     /**
      * Lavacharts constructor.
+     *
+     * @param array $config
      */
-    public function __construct()
-    {
+    public function __construct(array $config = [])
+    {dd($config);
+        if (!empty($defaultConfig)) {
+            $this->config = $config;
+        } else {
+            $this->config = $this->getDefaultConfig();
+        }
+
         if (!$this->usingComposer()) {
             require_once(__DIR__.'/Support/Psr4Autoloader.php');
 
@@ -462,5 +477,16 @@ class Lavacharts
         } else {
             return false;
         }
+    }
+
+    /**
+     * Loads the default configuration options from the defaults file.
+     *
+     * @access private
+     * @since 3.1.6
+     */
+    private function getDefaultConfig()
+    {
+        return require(__DIR__.'/Laravel/config/lavacharts.php');
     }
 }

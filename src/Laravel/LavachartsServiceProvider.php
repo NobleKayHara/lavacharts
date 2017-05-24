@@ -25,6 +25,20 @@ class LavachartsServiceProvider extends ServiceProvider
 {
     protected $defer = true;
 
+    private $configFile = 'lavacharts.php';
+
+    /**
+     * Create a new service provider instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     */
+    public function __construct($app)
+    {
+        parent::__construct($app);
+
+        $this->configPath = __DIR__.'/config/'.$this->configFile;
+    }
+
     public function boot()
     {
         /**
@@ -35,12 +49,20 @@ class LavachartsServiceProvider extends ServiceProvider
         }
 
         include __DIR__.'/BladeTemplateExtensions.php';
+
+        $this->publishes([
+            $this->configPath => config_path($this->configFile),
+        ]);
     }
 
     public function register()
     {
-        $this->app->singleton('lavacharts', function() {
-            return new Lavacharts;
+        $this->mergeConfigFrom($this->configPath, 'lavacharts');
+
+        $defaultConfig = $this->app['config']->get('lavacharts');
+
+        $this->app->singleton('lavacharts', function() use ($defaultConfig) {
+            return new Lavacharts($defaultConfig);
         });
 
         $this->app->booting(function() {
