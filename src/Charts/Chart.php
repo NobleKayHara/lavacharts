@@ -2,13 +2,12 @@
 
 namespace Khill\Lavacharts\Charts;
 
-use Khill\Lavacharts\Support\Contracts\DataTableInterface;
-use Khill\Lavacharts\Support\Customizable;
-use Khill\Lavacharts\DataTables\DataTable;
-use Khill\Lavacharts\Values\ElementId;
 use Khill\Lavacharts\Values\Label;
+use Khill\Lavacharts\Values\ElementId;
+use Khill\Lavacharts\Support\Customizable;
 use Khill\Lavacharts\Support\Traits\DataTableTrait as HasDataTable;
 use Khill\Lavacharts\Support\Traits\RenderableTrait as IsRenderable;
+use Khill\Lavacharts\Support\Contracts\DataTableInterface as DataTable;
 use Khill\Lavacharts\Support\Contracts\JsonableInterface as Jsonable;
 use Khill\Lavacharts\Support\Contracts\WrappableInterface as Wrappable;
 use Khill\Lavacharts\Support\Contracts\RenderableInterface as Renderable;
@@ -40,11 +39,11 @@ class Chart extends Customizable implements Renderable, Wrappable, Jsonable, Vis
     /**
      * Builds a new chart with the given label.
      *
-     * @param \Khill\Lavacharts\Values\Label         $chartLabel Identifying label for the chart.
-     * @param \Khill\Lavacharts\Support\Contracts\DataTableInterface $data DataTable used for the chart.
-     * @param array                                  $options Options fot the chart.
+     * @param \Khill\Lavacharts\Values\Label                         $chartLabel Identifying label for the chart.
+     * @param \Khill\Lavacharts\Support\Contracts\DataTableInterface $data       DataTable used for the chart.
+     * @param array                                                  $options    Options fot the chart.
      */
-    public function __construct(Label $chartLabel, DataTableInterface $data = null, array $options = [])
+    public function __construct(Label $chartLabel, DataTable $data = null, array $options = [])
     {
         parent::__construct($options);
 

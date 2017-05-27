@@ -17,7 +17,6 @@ use Khill\Lavacharts\Exceptions\InvalidRowDefinition;
 use Khill\Lavacharts\Exceptions\InvalidTimeZone;
 use Khill\Lavacharts\Support\Contracts\DataTableInterface as ToDataTable;
 use Khill\Lavacharts\Support\Contracts\JsonableInterface as Jsonable;
-use Khill\Lavacharts\Support\Traits\ToDataTableTrait;
 use Khill\Lavacharts\Values\Role;
 use Khill\Lavacharts\Values\StringValue;
 
@@ -45,22 +44,6 @@ use Khill\Lavacharts\Values\StringValue;
  */
 class DataTable implements ToDataTable, Jsonable, JsonSerializable
 {
-    use ToDataTableTrait;
-
-    /**
-     * Timezone for dealing with datetime and Carbon objects.
-     *
-     * @var \Khill\Lavacharts\DataTables\Columns\ColumnFactory
-     */
-    protected $columnFactory;
-
-    /**
-     * RowFactory for the DataTable
-     *
-     * @var \Khill\Lavacharts\DataTables\Rows\RowFactory
-     */
-    protected $rowFactory;
-
     /**
      * Array of the DataTable's column objects.
      *
@@ -76,11 +59,33 @@ class DataTable implements ToDataTable, Jsonable, JsonSerializable
     protected $rows = [];
 
     /**
+     * Timezone for interpreting datetimes.
+     *
+     * @var \DateTimeZone
+     */
+    protected $timezone;
+
+    /**
      * Format for Carbon to parse datetime strings.
      *
      * @var string
      */
     protected $dateTimeFormat;
+
+    /**
+     * Timezone for dealing with datetime and Carbon objects.
+     *
+     * @var \Khill\Lavacharts\DataTables\Columns\ColumnFactory
+     */
+    protected $columnFactory;
+
+    /**
+     * RowFactory for the DataTable
+     *
+     * @var \Khill\Lavacharts\DataTables\Rows\RowFactory
+     */
+    protected $rowFactory;
+
 
     /**
      * Creates a new DataTable
@@ -426,6 +431,120 @@ class DataTable implements ToDataTable, Jsonable, JsonSerializable
     }
 
     /**
+     * Returns a column based on it's index.
+     *
+     * @since  3.0.0
+     * @param  int $index
+     * @return \Khill\Lavacharts\DataTables\Columns\Column
+     * @throws \Khill\Lavacharts\Exceptions\InvalidColumnIndex
+     */
+    public function getColumn($index)
+    {
+        $this->indexCheck($index);
+
+        return $this->cols[$index];
+    }
+
+    /**
+     * Returns the column array from the DataTable
+     *
+     * @return \Khill\Lavacharts\DataTables\Columns\Column[]
+     */
+    public function getColumns()
+    {
+        return $this->cols;
+    }
+
+    /**
+     * Returns the number of columns in the DataTable
+     *
+     * @return int
+     */
+    public function getColumnCount()
+    {
+        return count($this->cols);
+    }
+
+    /**
+     * Returns the columns whos type match the given value.
+     *
+     * @since  3.0.0
+     * @param  string $type
+     * @return array
+     * @throws \Khill\Lavacharts\Exceptions\InvalidColumnType
+     */
+    public function getColumnsByType($type)
+    {
+        ColumnFactory::isValidType($type);
+
+        $indices = [];
+
+        foreach ($this->cols as $index => $column) {
+            if ($type === $column->getType()) {
+                $indices[$index] = $column;
+            }
+        }
+
+        return $indices;
+    }
+
+    /**
+     * Returns the type of a column based on it's index.
+     *
+     * @since  3.0.0
+     * @param  int $index
+     * @return string
+     * @throws \Khill\Lavacharts\Exceptions\InvalidColumnIndex
+     */
+    public function getColumnType($index)
+    {
+        return $this->getColumn($index)->getType();
+    }
+
+    /**
+     * Returns the types of columns currently defined.
+     *
+     * @since  2.5.2
+     * @return string[]
+     */
+    public function getColumnTypes()
+    {
+        foreach ($this->cols as $column) {
+            $colTypes[] = $column->getType();
+        }
+
+        return $colTypes;
+    }
+
+    /**
+     * Returns the label of a column based on it's index.
+     *
+     * @since  3.0.0
+     * @param  int $index
+     * @return string
+     * @throws \Khill\Lavacharts\Exceptions\InvalidColumnIndex
+     */
+    public function getColumnLabel($index)
+    {
+        return $this->getColumn($index)->getLabel();
+    }
+
+    /**
+     * Returns the labels of columns currently defined.
+     *
+     * @since  3.0.0
+     * @return string[]
+     */
+    public function getColumnLabels()
+    {
+        foreach ($this->cols as $column) {
+            $colTypes[] = $column->getLabel();
+        }
+
+        return $colTypes;
+    }
+
+    /**
      * Sets the format of the column.
      *
      * @param  integer $index
@@ -455,6 +574,35 @@ class DataTable implements ToDataTable, Jsonable, JsonSerializable
         }
 
         return $this;
+    }
+
+    /**
+     * Returns the formatted columns in an array from the DataTable
+     *
+     * @since  3.0.0
+     * @return \Khill\Lavacharts\DataTables\Columns\Column[]
+     */
+    public function getFormattedColumns()
+    {
+        $columns = [];
+
+        foreach ($this->cols as $index => $column) {
+            if ($column->isFormatted()) {
+                $columns[$index] = $column;
+            }
+        }
+
+        return $columns;
+    }
+
+    /**
+     * Boolean value if there are any formatted columns
+     *
+     * @return bool
+     */
+    public function hasFormattedColumns()
+    {
+        return count($this->getFormattedColumns()) > 0;
     }
 
     /**
@@ -550,146 +698,16 @@ class DataTable implements ToDataTable, Jsonable, JsonSerializable
     }
 
     /**
-     * Returns a column based on it's index.
+     * This is only here to fulfill the DataTableInterface.
      *
-     * @since  3.0.0
-     * @param  int $index
-     * @return \Khill\Lavacharts\DataTables\Columns\Column
-     * @throws \Khill\Lavacharts\Exceptions\InvalidColumnIndex
-     */
-    public function getColumn($index)
-    {
-        $this->indexCheck($index);
-
-        return $this->cols[$index];
-    }
-
-    /**
-     * Returns the column array from the DataTable
+     * Since a DataTable is a DataTable we'll just return it!
      *
-     * @return \Khill\Lavacharts\DataTables\Columns\Column[]
+     * @since  3.1.7
+     * @return \Khill\Lavacharts\DataTables\DataTable
      */
-    public function getColumns()
+    public function toDataTable()
     {
-        return $this->cols;
-    }
-
-    /**
-     * Returns the columns whos type match the given value.
-     *
-     * @since  3.0.0
-     * @param  string $type
-     * @return array
-     * @throws \Khill\Lavacharts\Exceptions\InvalidColumnType
-     */
-    public function getColumnsByType($type)
-    {
-        ColumnFactory::isValidType($type);
-
-        $indices = [];
-
-        foreach ($this->cols as $index => $column) {
-            if ($type === $column->getType()) {
-                $indices[$index] = $column;
-            }
-        }
-
-        return $indices;
-    }
-
-    /**
-     * Returns the number of columns in the DataTable
-     *
-     * @return int
-     */
-    public function getColumnCount()
-    {
-        return count($this->cols);
-    }
-
-    /**
-     * Returns the label of a column based on it's index.
-     *
-     * @since  3.0.0
-     * @param  int $index
-     * @return string
-     * @throws \Khill\Lavacharts\Exceptions\InvalidColumnIndex
-     */
-    public function getColumnLabel($index)
-    {
-        return $this->getColumn($index)->getLabel();
-    }
-
-    /**
-     * Returns the type of a column based on it's index.
-     *
-     * @since  3.0.0
-     * @param  int $index
-     * @return string
-     * @throws \Khill\Lavacharts\Exceptions\InvalidColumnIndex
-     */
-    public function getColumnType($index)
-    {
-        return $this->getColumn($index)->getType();
-    }
-
-    /**
-     * Returns the types of columns currently defined.
-     *
-     * @since  2.5.2
-     * @return string[]
-     */
-    public function getColumnTypes()
-    {
-        foreach ($this->cols as $column) {
-            $colTypes[] = $column->getType();
-        }
-
-        return $colTypes;
-    }
-
-    /**
-     * Returns the labels of columns currently defined.
-     *
-     * @since  3.0.0
-     * @return string[]
-     */
-    public function getColumnLabels()
-    {
-        foreach ($this->cols as $column) {
-            $colTypes[] = $column->getLabel();
-        }
-
-        return $colTypes;
-    }
-
-    /**
-     * Returns the formatted columns in an array from the DataTable
-     *
-     * @since  3.0.0
-     * @return \Khill\Lavacharts\DataTables\Columns\Column[]
-     */
-    public function getFormattedColumns()
-    {
-        $columns = [];
-
-        foreach ($this->cols as $index => $column) {
-            if ($column->isFormatted()) {
-                $columns[$index] = $column;
-            }
-        }
-
-        return $columns;
-    }
-
-    /**
-     * Boolean value if there are any formatted columns
-     *
-     * @return bool
-     */
-    public function hasFormattedColumns()
-    {
-        return count($this->getFormattedColumns()) > 0;
+        return $this;
     }
 
     /**

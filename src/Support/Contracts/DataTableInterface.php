@@ -7,8 +7,7 @@ namespace Khill\Lavacharts\Support\Contracts;
  *
  * This interface describes an object that can be turned into a DataTable by Lavacharts
  *
- *
- *
+ * @since     3.1.7
  * @package   Khill\Lavacharts\Support\Contracts
  * @author    Kevin Hill <kevinkhill@gmail.com>
  * @copyright (c) 2017, KHill Designs
@@ -36,7 +35,7 @@ interface DataTableInterface
     /**
      * return [
      *     ['date', 'Pay Date'],
-     *     ['number', 'Direct Deposit']
+     *     ['number', 'Check']
      * ];
      */
 
@@ -50,12 +49,12 @@ interface DataTableInterface
     public function getRows();
     /**
      * return $this
-     *     ->select(['pay_date', 'direct_deposit'])
-     *     ->where('direct_deposit', '<>', null)
+     *     ->select(['pay_date', 'check'])
+     *     ->where('check', '<>', null)
      *     ->orderBy('pay_date')
      *     ->get()
      *     ->transform(function ($s) {
-     *         return [$s->pay_date, $s->direct_deposit];
+     *         return [$s->pay_date, $s->check];
      *     })
      *     ->toArray();
      */

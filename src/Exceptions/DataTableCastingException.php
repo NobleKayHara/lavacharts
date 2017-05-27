@@ -4,9 +4,12 @@ namespace Khill\Lavacharts\Exceptions;
 
 class DataTableCastingException extends LavaException
 {
-    public function __construct($obj)
+    public function __construct($class, $missingMethod)
     {
-        $message = get_class($obj) . ' failed to be cast as a DataTable.';
+        $message = sprintf('Failed to cast %1$s as a DataTable because %1$s#%s() is not defined.',
+            get_class($class),
+            $missingMethod
+        );
 
         parent::__construct($message);
     }

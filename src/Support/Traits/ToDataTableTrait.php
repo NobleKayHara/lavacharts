@@ -4,6 +4,25 @@ namespace Khill\Lavacharts\Support\Traits;
 
 use Khill\Lavacharts\Exceptions\DataTableCastingException;
 
+/**
+ * Trait ToDataTableTrait
+ *
+ * Apply this trait to any class to enable the automatic casting to a DataTables.
+ *
+ * With this trait, and the user implementation of the methods getRows() and getColumns(),
+ * then the class is capable of being used as a DataTable. The class implementing the
+ * DataTableInterface can now be passed as the DataTable while creating charts.
+ *
+ *
+ * @see       \Khill\Lavacharts\Support\Contracts\DataTableInterface
+ * @since     3.1.7
+ * @package   Khill\Lavacharts\Support\Traits
+ * @author    Kevin Hill <kevinkhill@gmail.com>
+ * @copyright (c) 2017, KHill Designs
+ * @link      http://github.com/kevinkhill/lavacharts GitHub Repository Page
+ * @link      http://lavacharts.com                   Official Docs Site
+ * @license   http://opensource.org/licenses/MIT      MIT
+ */
 trait ToDataTableTrait
 {
     /**
@@ -16,41 +35,18 @@ trait ToDataTableTrait
     {
         $data = new \Khill\Lavacharts\DataTables\DataTable;
 
-        if (property_exists($this, 'columns')) {
-            $columns = $this->columns;
+        if ( ! method_exists($this, 'getColumns')) {
+            throw new DataTableCastingException($this, 'getColumns');
         }
 
-        if (method_exists($this, 'getColumns')) {
-            $columns = $this->getColumns();
-        }
+        if ( ! method_exists($this, 'getRows')) {
+            throw new DataTableCastingException($this, 'getRows');
+         }
 
-        if (property_exists($this, 'rows')) {
-            $rows = $this->rows;
-        }
-
-        if (method_exists($this, 'getRows')) {
-            $rows = $this->getRows();
-        }
-
-        if (! isset($rows) || ! isset($columns)) {
-            throw new DataTableCastingException($this);
-        }
-
-        $data->addColumns($columns);
-        $data->addRows($rows);
+        $data->addColumns($this->getColumns());
+        $data->addRows($this->getRows());
 
         return $data;
-    }
-
-
-    private function getColumnDefinition()
-    {
-        return $this->columns;
-    }
-
-    public function getRowDefinition()
-    {
-        return $this->rows;
     }
 }
 
