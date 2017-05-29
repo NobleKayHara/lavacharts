@@ -2,8 +2,6 @@
 
 namespace Khill\Lavacharts\Support\Traits;
 
-use Khill\Lavacharts\Exceptions\DataTableCastingException;
-
 /**
  * Trait ToDataTableTrait
  *
@@ -15,7 +13,7 @@ use Khill\Lavacharts\Exceptions\DataTableCastingException;
  *
  *
  * @see       \Khill\Lavacharts\Support\Contracts\DataTableInterface
- * @since     3.1.7
+ * @since     3.1.6
  * @package   Khill\Lavacharts\Support\Traits
  * @author    Kevin Hill <kevinkhill@gmail.com>
  * @copyright (c) 2017, KHill Designs
@@ -34,14 +32,6 @@ trait ToDataTableTrait
     public function toDataTable()
     {
         $data = new \Khill\Lavacharts\DataTables\DataTable;
-
-        if ( ! method_exists($this, 'getColumns')) {
-            throw new DataTableCastingException($this, 'getColumns');
-        }
-
-        if ( ! method_exists($this, 'getRows')) {
-            throw new DataTableCastingException($this, 'getRows');
-         }
 
         $data->addColumns($this->getColumns());
         $data->addRows($this->getRows());

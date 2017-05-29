@@ -69,13 +69,9 @@ class Lavacharts
      */
     public function __construct(array $config = [])
     {
-        if (!empty($defaultConfig)) {
-            $this->config = $config;
-        } else {
-            $this->config = $this->getDefaultConfig();
-        }
+        $this->config = empty($config) ? $this->getDefaultConfig() : $config;
 
-        if (!$this->usingComposer()) {
+        if (! $this->usingComposer()) {
             require_once(__DIR__.'/Support/Psr4Autoloader.php');
 
             $loader = new Psr4Autoloader;
@@ -111,11 +107,11 @@ class Lavacharts
             if ($this->exists($method, $args[0])) {
                 $label = new Label($args[0]);
 
-                $lavaClass = $this->volcano->get($method, $label);
+                return $this->volcano->get($method, $label);
             } else {
                 $chart = $this->chartFactory->create($method, $args);
 
-                $lavaClass = $this->volcano->store($chart);
+                return $this->volcano->store($chart);
             }
         }
 
@@ -123,21 +119,48 @@ class Lavacharts
         if ((bool) preg_match('/Filter$/', $method)) {
             $options = isset($args[1]) ? $args[1] : [];
 
-            $lavaClass = FilterFactory::create($method, $args[0], $options);
+            return FilterFactory::create($method, $args[0], $options);
         }
 
         //Formats
         if ((bool) preg_match('/Format$/', $method)) {
             $options = isset($args[0]) ? $args[0] : [];
 
-            $lavaClass = Format::create($method, $options);
+            return Format::create($method, $options);
         }
 
-        if (isset($lavaClass) == false) {
-            throw new InvalidLavaObject($method);
-        }
+        return null;
+    }
 
-        return $lavaClass;
+    /**
+     * Set a config value for the package.
+     *
+     * @since  3.1.6
+     * @param  string $key
+     * @param  string $value
+     * @return bool True if the config value was set, false if not a valid config value
+     */
+    public function setConfig($key, $value)
+    {
+        if (array_key_exists($key, $this->config)) {
+            $this->config[$key] = $value;
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Retrieve a config value from the package.
+     *
+     * @since  3.1.6
+     * @param  string $key
+     * @return string
+     */
+    public function getConfig($key)
+    {
+        return array_key_exists($key, $this->config) ? $this->config[$key] : null;
     }
 
     /**
@@ -148,10 +171,9 @@ class Lavacharts
      *
      * @since  3.0.3
      * @uses   \Khill\Lavacharts\DataTables\DataFactory
-     * @param  mixed $args
      * @return \Khill\Lavacharts\DataTables\DataTable
      */
-    public function DataTable($args = null)
+    public function DataTable()
     {
         $dataFactory = __NAMESPACE__.'\\DataTables\\DataFactory::DataTable';
 
@@ -162,21 +184,19 @@ class Lavacharts
      * Create a new Dashboard
      *
      * @since  3.0.0
-     * @param  string                                 $label
+     * @param  \Khill\Lavacharts\Values\Label $label
      * @param  \Khill\Lavacharts\DataTables\DataTable $dataTable
      * @return \Khill\Lavacharts\Dashboards\Dashboard
      */
     public function Dashboard($label, DataTable $dataTable)
     {
         if ($this->exists('Dashboard', $label)) {
-            $dashboard = $this->volcano->get('Dashboard', $label);
-        } else {
-            $dashboard = $this->volcano->store(
-                $this->dashFactory->create(func_get_args())
-            );
+            return $this->volcano->get('Dashboard', $label);
         }
 
-        return $dashboard;
+        return $this->volcano->store(
+            $this->dashFactory->create(func_get_args())
+        );
     }
 
     /**
@@ -219,6 +239,7 @@ class Lavacharts
      * By default, Lavacharts is loaded with the "en" locale. You can override this default
      * by explicitly specifying a locale when creating the DataTable.
      *
+     * @deprecated 3.1.6 The new method for setting the locale is: setConfig('locale', 'en')
      * @since  3.1.0
      * @param  string $locale
      * @return $this
@@ -233,6 +254,7 @@ class Lavacharts
     /**
      * Returns the current locale used in the DataTable
      *
+     * @deprecated 3.1.6 The new method for fetching the locale is: getConfig('locale')
      * @since  3.1.0
      * @return string
      */
@@ -455,7 +477,6 @@ class Lavacharts
      *
      * This will check if the folder 'composer' is within the path to Lavacharts.
      *
-     * @access private
      * @since  2.4.0
      * @return boolean
      */
@@ -471,8 +492,8 @@ class Lavacharts
     /**
      * Loads the default configuration options from the defaults file.
      *
-     * @access private
-     * @since 3.1.6
+     * @since  3.1.6
+     * @return array
      */
     private function getDefaultConfig()
     {

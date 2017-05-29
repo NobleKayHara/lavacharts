@@ -54,19 +54,17 @@ class Volcano
      *
      * @since  3.0.3
      * @param  \Khill\Lavacharts\Support\Contracts\RenderableInterface $renderable
-     * @return \Khill\Lavacharts\Support\Contracts\RenderableInterface
+     * @return \Khill\Lavacharts\Charts\Chart|\Khill\Lavacharts\Dashboards\Dashboard
      */
     public function store(Renderable $renderable)
     {
         if ($renderable instanceof Dashboard) {
-            $retVal = $this->storeDashboard($renderable);
+            return $this->storeDashboard($renderable);
         }
 
         if ($renderable instanceof Chart) {
-            $retVal = $this->storeChart($renderable);
+            return $this->storeChart($renderable);
         }
-
-        return $retVal;
     }
 
     /**
@@ -75,7 +73,7 @@ class Volcano
      * @since  3.0.3
      * @param  string                         $type  Type of Chart or Dashboard.
      * @param  \Khill\Lavacharts\Values\Label $label Label of the Chart or Dashboard.
-     * @return \Khill\Lavacharts\Support\Contracts\RenderableInterface
+     * @return \Khill\Lavacharts\Charts\Chart|\Khill\Lavacharts\Dashboards\Dashboard
      * @throws \Khill\Lavacharts\Exceptions\ChartNotFound
      * @throws \Khill\Lavacharts\Exceptions\DashboardNotFound
      */

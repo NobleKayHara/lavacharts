@@ -51,7 +51,7 @@ class ColumnFactory
      * @param  string                                      $role    A role for the column to play.
      * @param  array                                       $options Column options.
      * @return \Khill\Lavacharts\DataTables\Columns\Column
-     * @throws \Khill\Lavacharts\Exceptions\InvalidColumnRole
+     * @throws \Khill\Lavacharts\Exceptions\InvalidColumnType
      */
     public function create(
         $type,
@@ -60,7 +60,10 @@ class ColumnFactory
         $role = '',
         array $options = []
     ) {
-        self::isValidType($type);
+
+        if ( ! self::isValidType($type)) {
+            throw new InvalidColumnType($type);
+        }
 
         $builder = new ColumnBuilder();
         $builder->setType($type);
@@ -93,12 +96,11 @@ class ColumnFactory
      * Checks if a given type is a valid column type
      *
      * @param  string $type
+     * @return bool
      * @throws \Khill\Lavacharts\Exceptions\InvalidColumnType
      */
     public static function isValidType($type)
     {
-        if (in_array($type, self::$types, true) === false) {
-            throw new InvalidColumnType($type, self::$types);
-        }
+        return in_array($type, self::$types, true);
     }
 }

@@ -48,6 +48,7 @@ class Chart extends Customizable implements Renderable, Wrappable, Jsonable, Vis
         parent::__construct($options);
 
         $this->label = $chartLabel;
+
         $this->datatable = $data->toDataTable();
 
         if (array_key_exists('elementId', $options)) {
@@ -147,6 +148,7 @@ class Chart extends Customizable implements Renderable, Wrappable, Jsonable, Vis
      *
      * This is method was added in 2.5 as a bandaid to remove the handcuffs from
      * users who want to add options that Google has added, that I have not.
+     *
      * I didn't intend to restrict the user to only select options, as the
      * goal was to type isNonEmpty and validate. This method can be used to set
      * any option, just pass in arrays with key value pairs for any setting.
@@ -154,6 +156,7 @@ class Chart extends Customizable implements Renderable, Wrappable, Jsonable, Vis
      * If the setting is an object, per the google docs, then use multi-dimensional
      * arrays and they will be converted upon rendering.
      *
+     * @deprecated 3.1.6 Since this is just a wrapper around a different method.
      * @since  3.0.0
      * @param  array $options Array of customization options for the chart
      * @return \Khill\Lavacharts\Charts\Chart

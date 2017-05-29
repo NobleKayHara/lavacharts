@@ -1,13 +1,14 @@
-- 3.1.7
-  - Adding `DataTableInterface` and `ToDataTableTrait` so any class can be automatically converted to a DataTable and passed in when creating Charts. Example usage would be to apply this interface to a Database Model (Eloquent anyone?) and then you can just pass in a Model and it will transform into a DataTable.
-  
 - 3.1.6
-  - Adding config file to further customize lavacharts.
-  - Can be published in Laravel with `php artisan vendor:publish`
-  - If the main Lavacharts class is not passed an array of config values
-    when created then defaults will be loaded from `src/Laravel/config/lavacharts.php`
-  - The values are self documented in the file, [just check out the source](https://github.com/kevinkhill/lavacharts/blob/3.1-dev/src/Laravel/config/lavacharts.php).
-
+    - Adding `DataTableInterface` and `ToDataTableTrait`
+      - Any class can be automatically converted to a DataTable and passed in when creating Charts.
+      - An example use would be to apply this interface to a database model (Eloquent anyone?) and then it can be defined to return columns and rows and transform into a DataTable.
+    - Adding global configuration of Lavacharts
+      - The available config values are [documented in the source](https://github.com/kevinkhill/lavacharts/blob/3.1-dev/src/Laravel/config/lavacharts.php).
+      - If using Laravel, the config file can be published with:
+        - `php artisan vendor:publish --provider=\Khill\Lavacharts\Laravel\LavachartsServiceProvider.php`
+      - If the main Lavacharts class is not passed an array of config values
+      when created then defaults will be loaded from `src/Laravel/config/lavacharts.php`
+      
 - 3.1.5
   - Adding DonutChart as an alias for PieChart back.
 

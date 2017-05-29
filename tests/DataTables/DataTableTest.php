@@ -99,6 +99,8 @@ class DataTableTest extends ProvidersTestCase
 
     public function testSetTimezoneWithConstructor()
     {
+        $this->markTestSkipped('Removing timezone setting from constructor.');
+
         $datatable = new DataTable($this->tzNY);
 
         $tz = $this->inspect($datatable, 'timezone');
@@ -520,7 +522,7 @@ class DataTableTest extends ProvidersTestCase
     /**
      * @depends testAddColumnViaNamedAlias
      * @dataProvider nonCarbonOrDateStringProvider
-     * @expectedException \Exception
+     * @expectedException \Khill\Lavacharts\Exceptions\InvalidDate
      * @covers \Khill\Lavacharts\DataTables\DataTable::addRow
      */
     public function testAddRowWithBadDateTypes($badDate)

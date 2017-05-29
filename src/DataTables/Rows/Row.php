@@ -2,7 +2,6 @@
 
 namespace Khill\Lavacharts\DataTables\Rows;
 
-use Carbon\Carbon;
 use Khill\Lavacharts\DataTables\Cells\NullCell;
 use Khill\Lavacharts\Values\StringValue;
 use Khill\Lavacharts\DataTables\Cells\Cell;

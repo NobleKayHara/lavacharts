@@ -2,6 +2,7 @@
 
 namespace Khill\Lavacharts\DataTables;
 
+use Closure;
 use DateTimeZone;
 use JsonSerializable;
 use Khill\Lavacharts\DataTables\Columns\Column;
@@ -90,17 +91,30 @@ class DataTable implements ToDataTable, Jsonable, JsonSerializable
     /**
      * Creates a new DataTable
      *
-     * @param string $timezone Timezone to use when dealing with dates & times
+     * @param \Closure|array $columns
+     * @param \Closure|array $rows
      */
-    public function __construct($timezone = null)
+    public function __construct($columns = [], $rows = [])
     {
         $this->columnFactory = new ColumnFactory;
 
-        if ($timezone === null) {
-            $timezone = date_default_timezone_get();
+        $this->setTimezone(date_default_timezone_get());
+
+        if (is_array($columns)) {
+            $this->addColumns($columns);
         }
 
-        $this->setTimezone($timezone);
+        if ($columns instanceof Closure) {
+            $this->addColumns($columns());
+        }
+
+        if (is_array($rows)) {
+            $this->addRows($rows);
+        }
+
+        if ($rows instanceof Closure) {
+            $this->addRows($rows());
+        }
     }
 
     /**
@@ -475,17 +489,17 @@ class DataTable implements ToDataTable, Jsonable, JsonSerializable
      */
     public function getColumnsByType($type)
     {
-        ColumnFactory::isValidType($type);
+        $columns = [];
 
-        $indices = [];
-
-        foreach ($this->cols as $index => $column) {
-            if ($type === $column->getType()) {
-                $indices[$index] = $column;
+        if (ColumnFactory::isValidType($type)) {
+            foreach ($this->cols as $index => $column) {
+                if ($type === $column->getType()) {
+                    $columns[$index] = $column;
+                }
             }
         }
 
-        return $indices;
+        return $columns;
     }
 
     /**
@@ -509,11 +523,9 @@ class DataTable implements ToDataTable, Jsonable, JsonSerializable
      */
     public function getColumnTypes()
     {
-        foreach ($this->cols as $column) {
-            $colTypes[] = $column->getType();
-        }
-
-        return $colTypes;
+        return array_walk($this->cols, function (Column $column) {
+            return $column->getType();
+        });
     }
 
     /**
@@ -537,11 +549,9 @@ class DataTable implements ToDataTable, Jsonable, JsonSerializable
      */
     public function getColumnLabels()
     {
-        foreach ($this->cols as $column) {
-            $colTypes[] = $column->getLabel();
-        }
-
-        return $colTypes;
+        return array_walk($this->cols, function (Column $column) {
+            return $column->getLabel();
+        });
     }
 
     /**
@@ -653,7 +663,7 @@ class DataTable implements ToDataTable, Jsonable, JsonSerializable
      * Adds multiple rows to the DataTable.
      *
      * @see    addRow()
-     * @since 3.1.6 Added the ability to accept row Classes as well as array definitions.
+     * @since  3.1.6 Added the ability to accept Row classes as well as array definitions.
      * @param  \Khill\Lavacharts\DataTables\Rows\Row[] $arrayOfRows
      * @return \Khill\Lavacharts\DataTables\DataTable
      * @throws \Khill\Lavacharts\Exceptions\InvalidConfigValue
@@ -664,14 +674,11 @@ class DataTable implements ToDataTable, Jsonable, JsonSerializable
         foreach ($arrayOfRows as $row) {
             if ($row instanceof Row) {
                 $this->rows[] = $row;
-            } else {
-                if (is_array($row) === false) {
-                    throw new InvalidRowDefinition($row);
-                }
-
+            } else if (is_array($row)) {
                 $this->addRow($row);
+            } else {
+                throw new InvalidRowDefinition($row);
             }
-
         }
 
         return $this;
@@ -702,7 +709,7 @@ class DataTable implements ToDataTable, Jsonable, JsonSerializable
      *
      * Since a DataTable is a DataTable we'll just return it!
      *
-     * @since  3.1.7
+     * @since  3.1.6
      * @return \Khill\Lavacharts\DataTables\DataTable
      */
     public function toDataTable()
@@ -755,7 +762,7 @@ class DataTable implements ToDataTable, Jsonable, JsonSerializable
     }
 
     /**
-     * Used to isNonEmpty if a number is a valid column index of the DataTable
+     * Used to check if a number is a valid column index of the DataTable
      *
      * @access protected
      * @param  int $index

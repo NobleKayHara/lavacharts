@@ -7,7 +7,7 @@ namespace Khill\Lavacharts\Support\Contracts;
  *
  * This interface describes an object that can be turned into a DataTable by Lavacharts
  *
- * @since     3.1.7
+ * @since     3.1.6
  * @package   Khill\Lavacharts\Support\Contracts
  * @author    Kevin Hill <kevinkhill@gmail.com>
  * @copyright (c) 2017, KHill Designs
@@ -18,8 +18,8 @@ namespace Khill\Lavacharts\Support\Contracts;
 interface DataTableInterface
 {
     /**
-     * The method that will be called when this object is going to be cast
-     * as a DataTable
+     * The method that will be called when the implementing class is
+     * going to be cast as a DataTable.
      *
      * @returns \Khill\Lavacharts\DataTables\DataTable
      */
@@ -31,7 +31,7 @@ interface DataTableInterface
      *
      * @return array[][]
      */
-    public function getColumns();
+//    public function getColumns();
     /**
      * return [
      *     ['date', 'Pay Date'],
@@ -46,7 +46,7 @@ interface DataTableInterface
      *
      * @return array[][]
      */
-    public function getRows();
+//    public function getRows();
     /**
      * return $this
      *     ->select(['pay_date', 'check'])
