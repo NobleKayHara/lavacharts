@@ -28,11 +28,7 @@ trait ElementIdTrait
      */
     public function setElementId($elementId)
     {
-        if ($elementId instanceof ElementId) {
-            $this->elementId = $elementId;
-        } else {
-            $this->elementId = new ElementId($elementId);
-        }
+        $this->elementId = $elementId instanceof ElementId ? $elementId : new ElementId($elementId);
     }
 
     /**

@@ -39,11 +39,11 @@ class RowFactory
      * Creates a new RowFactory instance.
      *
      * @access public
-     * @param  \Khill\Lavacharts\DataTables\DataTable $datatable
+     * @param \Khill\Lavacharts\DataTables\DataTable|\Khill\Lavacharts\Support\Contracts\DataTableInterface $data
      */
-    public function __construct(DataTable $datatable)
+    public function __construct(DataTable $data)
     {
-        $this->datatable = $datatable;
+        $this->datatable = $data->toDataTable();
     }
 
     /**

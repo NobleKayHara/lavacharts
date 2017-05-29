@@ -31,7 +31,7 @@ trait MaterialRenderableTrait
      */
     public function setMaterialOutput($png)
     {
-        $this->material = $png;
+        $this->material = (bool) $png;
     }
 
     /**

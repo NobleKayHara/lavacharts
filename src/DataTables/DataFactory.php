@@ -33,8 +33,7 @@ class DataFactory
      *
      * If given an array for the second parameter, then it will be interpreted as
      * row definitions.
-     *
-     * @param  mixed  $columns  Array of columns or timezone
+     * or timezone
      * @param  array  $rows     Array of rows
      * @param  string $timezone Timezone to use while using Carbon
      * @return \Khill\Lavacharts\DataTables\DataTable

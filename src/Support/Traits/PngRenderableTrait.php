@@ -31,7 +31,7 @@ trait PngRenderableTrait
      */
     public function setPngOutput($png)
     {
-        $this->png = $png;
+        $this->png = (bool) $png;
     }
 
     /**

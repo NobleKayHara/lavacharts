@@ -73,7 +73,7 @@ trait RenderableTrait
     /**
      * Returns the label.
      *
-     * @return \Khill\Lavacharts\Values\Label
+     * @return string
      */
     public function getLabelStr()
     {
